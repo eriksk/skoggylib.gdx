@@ -3,16 +3,14 @@ package se.skoggy.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
 import se.skoggy.atlases.DynamicTexture;
+import se.skoggy.audio.IAudio;
 import se.skoggy.entity.Entity;
 import se.skoggy.input.ITouchInput;
 import se.skoggy.utils.ServiceLocator;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class TouchButton extends Entity implements UIElement{
 
@@ -32,6 +30,7 @@ public class TouchButton extends Entity implements UIElement{
 	}
 
 	private void clicked() {
+		ServiceLocator.context.locate(IAudio.class).play("ui_click");
 		for (TouchButtonEventListener l : listeners) {
 			l.clicked(this);
 		}

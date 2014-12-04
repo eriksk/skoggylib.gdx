@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.BitmapFontData;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -16,6 +17,7 @@ public class ContentManager implements Disposable{
 	boolean flipYOnSprites;
 
 	private HashMap<String, Texture> textureCache;
+	private HashMap<String, FontCache> fontCache;
 	
 	public ContentManager(String contentRoot, boolean flipYOnSprites){
 		this.contentRoot = contentRoot;
@@ -24,10 +26,21 @@ public class ContentManager implements Disposable{
 			this.contentRoot += "/";
 		}
 		textureCache = new HashMap<String, Texture>();
+		fontCache = new HashMap<String, FontCache>();
 	}
 
 	public String getRootDirectory() {
 		return contentRoot;
+	}
+
+	public void dispose() {
+		for (Texture texture: textureCache.values()) {
+			texture.dispose();
+		}
+		textureCache.clear();
+		for (FontCache font : fontCache.values()) {
+			font.dispose();
+		}
 	}
 
 	public Texture loadRawTexture(String name) {
@@ -73,10 +86,13 @@ public class ContentManager implements Disposable{
 	}
 
 	public BitmapFont loadFont(String name){
-		return new BitmapFont(Gdx.files.internal(MessageFormat.format("{0}fonts/{1}.fnt", contentRoot, name)), Gdx.files.internal(MessageFormat.format("{0}fonts/{1}.png", contentRoot, name)), true);
-	}
+		if(fontCache.containsKey(name))
+			return fontCache.get(name).createFont();
+		
+		BitmapFontData data = new BitmapFontData(Gdx.files.internal(MessageFormat.format("{0}fonts/{1}.fnt", contentRoot, name)), true);
+		Texture texture = new Texture(Gdx.files.internal(MessageFormat.format("{0}fonts/{1}.png", contentRoot, name)));
+		fontCache.put(name, new FontCache(data, texture));
 
-	public void dispose() {
-		// TODO: cache all textures and dispose here
+		return fontCache.get(name).createFont();
 	}
 }

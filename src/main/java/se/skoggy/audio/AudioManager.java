@@ -1,15 +1,15 @@
 package se.skoggy.audio;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import se.skoggy.content.ContentManager;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-
-import se.skoggy.content.ContentManager;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class AudioManager implements IAudio{
 
@@ -20,8 +20,10 @@ public class AudioManager implements IAudio{
 	protected boolean muted;
 
 	private List<String> soundNames, songNames;
+	private String audioDirectoryName;
 
-	public AudioManager(){
+	public AudioManager(String audioDirectoryName){
+		this.audioDirectoryName = audioDirectoryName;
 		sounds = new HashMap<String, Sound>();
 		songs = new HashMap<String, Music>();
 		soundNames = new ArrayList<String>();
@@ -63,10 +65,12 @@ public class AudioManager implements IAudio{
 	 */
 	public void load(ContentManager content){
 		for (String name : soundNames) {
-			sounds.put(getNameWithoutPath(name), Gdx.audio.newSound(Gdx.files.internal(name)));
+			String path = MessageFormat.format("{0}{1}/{2}", content.getRootDirectory(), audioDirectoryName, name);
+			sounds.put(getNameWithoutPath(name), Gdx.audio.newSound(Gdx.files.internal(path)));
 		}
 		for (String name : songNames) {
-			songs.put(getNameWithoutPath(name), Gdx.audio.newMusic(Gdx.files.internal(name)));
+			String path = MessageFormat.format("{0}{1}/{2}", content.getRootDirectory(), audioDirectoryName, name);
+			songs.put(getNameWithoutPath(name), Gdx.audio.newMusic(Gdx.files.internal(path)));
 		}
 	}
 
